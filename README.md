@@ -1,13 +1,13 @@
 # 智能求职辅助系统（独立部署版）
 
-从课程工程 `sb_test` 中抽取的**求职辅助子系统**，只保留简历、岗位、分析、模拟面试、反馈、用户权限与 AI 网关，
-不包含原电商 AI 客服的 FAQ / 商品 / 订单 / Milvus 功能，依赖更少、启动更快，可单独部署与提交。
+从课程工程 `sb_test` 中抽取的**求职辅助子系统**，只保留简历、岗位、分析、模拟面试、反馈、用户权限、AI 网关与向量检索，
+不包含原电商 AI 客服的 FAQ / 商品 / 订单相关功能，依赖更少、启动更快，可单独部署与提交。
 > 工程位置：`C:\soft\job-assistant`（标准 Spring Boot 工程，含 `mvnw` 包装器；也可用 `mvn.cmd` 或 IDE 直接导入）。
 
-- 后端：Java 17 + Spring Boot 3.5.16 + MyBatis（注解式）+ MySQL 8 + Druid + Spring AI Alibaba（DashScope / 通义千问） + Milvus 2.4（向量检索 RAG）
+- 后端：Java 17 + Spring Boot 3.5.16 + MyBatis（注解式）+ MySQL 8 + Druid + Spring AI Alibaba（DashScope / 通义千问）+ Milvus 2.4（向量检索 RAG）
 - 前端：原生 ES Module + Hash 路由 SPA（零构建），`src/main/resources/static/job/`
 - 数据库：`job_assistant`，执行 `sql/schema.sql` 一键建库建表
-- 测试：203 个自动化用例（JUnit 5 + Mockito + MockMvc），另有端到端冒烟脚本与页面截图脚本
+- 测试：223 个自动化用例（JUnit 5 + Mockito + MockMvc），另有端到端冒烟脚本与页面截图脚本
 
 ## 一、快速开始
 
