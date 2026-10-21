@@ -1,7 +1,7 @@
 package com.nuist.agent.job.interview;
 
-import com.nuist.agent.job.dto.JobDtos;
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.dto.JobDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 
 /**
  * 文字模拟面试服务（成员 C）。

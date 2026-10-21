@@ -2,8 +2,8 @@ package com.nuist.agent.job.resume;
 
 import com.nuist.agent.entity.JobResume;
 import com.nuist.agent.entity.JobResumeVersion;
-import com.nuist.agent.job.dto.JobDtos;
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.dto.JobDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

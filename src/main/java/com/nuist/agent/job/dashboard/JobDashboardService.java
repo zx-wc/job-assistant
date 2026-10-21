@@ -1,7 +1,7 @@
 package com.nuist.agent.job.dashboard;
 
 import com.nuist.agent.job.analysis.ResumeAnalysisService;
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 import com.nuist.agent.job.interview.InterviewService;
 import com.nuist.agent.job.position.JobPositionService;
 import com.nuist.agent.job.resume.JobResumeService;

@@ -1,8 +1,8 @@
 package com.nuist.agent.job.position;
 
 import com.nuist.agent.entity.JobPosition;
-import com.nuist.agent.job.dto.JobDtos;
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.dto.JobDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 
 /**
  * 岗位信息管理服务（成员 B）。

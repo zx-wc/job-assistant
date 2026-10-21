@@ -1,13 +1,13 @@
 package com.nuist.agent.job.position;
 
-import com.nuist.agent.common.ErrorCode;
+import com.nuist.agent.zhangxu.common.ErrorCode;
 import com.nuist.agent.entity.JobPosition;
-import com.nuist.agent.exception.BusinessException;
-import com.nuist.agent.job.common.PrivacyMasker;
-import com.nuist.agent.job.dto.JobDtos;
-import com.nuist.agent.job.dto.ViewDtos;
-import com.nuist.agent.job.rag.JobVectorService;
-import com.nuist.agent.job.rag.JobVectorServiceImpl;
+import com.nuist.agent.zhangxu.exception.BusinessException;
+import com.nuist.agent.zhangxu.common.PrivacyMasker;
+import com.nuist.agent.zhangxu.dto.JobDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
+import com.nuist.agent.zhangxu.rag.JobVectorService;
+import com.nuist.agent.zhangxu.rag.JobVectorServiceImpl;
 import com.nuist.agent.mapper.JobPositionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

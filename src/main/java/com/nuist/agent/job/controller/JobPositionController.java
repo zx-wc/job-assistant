@@ -1,10 +1,10 @@
 package com.nuist.agent.job.controller;
 
 import com.nuist.agent.entity.JobPosition;
-import com.nuist.agent.entity.R;
-import com.nuist.agent.job.auth.UserContextHolder;
-import com.nuist.agent.job.dto.JobDtos;
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.entity.R;
+import com.nuist.agent.zhangxu.auth.UserContextHolder;
+import com.nuist.agent.zhangxu.dto.JobDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 import com.nuist.agent.job.position.JobPositionService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

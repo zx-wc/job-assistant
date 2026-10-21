@@ -34,21 +34,25 @@ java -jar target/job-assistant-1.0.0.jar
 > 数据库账号密码在 `application.yml` 中通过 `${DB_USERNAME:root}` / `${DB_PASSWORD:Nuist@123}` 读取，
 > 可用环境变量覆盖，无需改代码。
 
-## 二、功能模块与代码位置
+## 二、功能模块与代码位置（按五人分工划分包）
 
-| 模块 | 代码位置 | 说明 |
-| --- | --- | --- |
-| 用户与权限 | `job/auth/` | 注册登录、32 位令牌 + 7 天滑动续期、注销、USER/ADMIN、拦截器 + ThreadLocal 用户上下文 |
-| 向量检索 RAG | `job/rag/`、`job/config/JobVectorConfig.java` | 简历/岗位切块写入 Milvus，分析与出题前语义召回注入提示词；懒连接 + 不可用自动降级 |
-| AI 网关 | `job/ai/` | 模板三级加载、超时、重试 + 备用模型、单用户限流、结果缓存、熔断降级、结构化 JSON、调用日志 |
-| 公共组件 | `job/common/`、`job/config/` | 统一响应异常、配置绑定、JSON 工具、敏感信息脱敏 |
-| 简历管理 | `job/resume/` | 增删改查、txt/md 导入、正文变更自动留版本、版本查看/存档/回滚 |
-| 岗位管理 | `job/position/` | 岗位与 JD 录入、检索、增删改查 |
-| 简历岗位分析 | `job/analysis/` | 匹配度 + 维度评分 + 优势/短板/建议/缺失技能/面试重点，AI 不可用时关键词降级 |
-| 模拟面试 | `job/interview/` | 围绕岗位出题、逐题评分点评、多轮追问、整场反馈报告、训练记录 |
-| 接口层 | `job/controller/` | `/api/job/**` 共 39 个接口 |
-| 前端 | `static/job/` | 登录注册、概览、简历、岗位、分析、面试、反馈、AI 网关管理共 11 个页面 |
-| 数据库 | `sql/schema.sql` | 13 张表（2 张基础 + 11 张业务）+ 索引 + 演示数据 |
+包结构按课程任务划分组织：**A（组长）的代码统一放在 `com.nuist.agent.zhangxu` 包下**，B/C 的业务模块在 `com.nuist.agent.job.*`，D 的前端在 `static/job/`，E 的脚本与建库在 `sql/`、`scripts/`。
+
+| 分工 | 模块 | 代码位置 | 说明 |
+| --- | --- | --- | --- |
+| A | 用户与权限 | `zhangxu/auth/`、`zhangxu/controller/JobAuthController.java` | 注册登录、32 位令牌 + 7 天滑动续期、注销、USER/ADMIN、拦截器 + ThreadLocal 用户上下文 |
+| A | AI 网关 | `zhangxu/ai/`、`zhangxu/controller/JobAdminAiController.java` | 模板三级加载、超时、重试 + 备用模型、单用户限流、结果缓存、熔断降级、结构化 JSON、调用日志 |
+| A | 向量检索 RAG | `zhangxu/rag/`、`zhangxu/config/JobVectorConfig.java` | 简历/岗位切块写入 Milvus，分析与出题前语义召回注入提示词；懒连接 + 不可用自动降级 |
+| A | 公共组件 | `zhangxu/common/`、`zhangxu/config/`、`zhangxu/exception/`、`zhangxu/dto/`、`zhangxu/entity/`、`zhangxu/mapper/` | 统一响应 `R` 与错误码、全局异常、配置绑定、JSON 工具、敏感信息脱敏、接口 DTO、A 模块实体与 Mapper |
+| B | 简历管理 | `job/resume/` | 增删改查、txt/md 导入、正文变更自动留版本、版本查看/存档/回滚 |
+| B | 岗位管理 | `job/position/` | 岗位与 JD 录入、检索、增删改查 |
+| B | 简历岗位分析 | `job/analysis/` | 匹配度 + 维度评分 + 优势/短板/建议/缺失技能/面试重点，AI 不可用时关键词降级 |
+| C | 模拟面试 | `job/interview/` | 围绕岗位出题、逐题评分点评、多轮追问、整场反馈报告、训练记录 |
+| A/D | 求职概览与接口层 | `job/dashboard/`、`job/controller/` | 概览统计聚合；`/api/job/**` 共 42 个接口（含 A 的两个控制器在 `zhangxu/controller`） |
+| D | 前端 | `static/job/` | 登录注册、概览、简历、岗位、分析、面试、反馈、AI 网关管理共 11 个页面 |
+| E | 数据库与脚本 | `sql/schema.sql`、`scripts/` | 13 张表（2 张基础 + 11 张业务）+ 索引 + 演示数据；冒烟/截图/文档脚本 |
+
+> 其余成员若要按同样方式拆包，告我名字即可（如 B 的 `job/resume|position|analysis` 迁到 `com.nuist.agent.<名字>.*`）。
 
 ## 三、接口一览（前缀 `/api/job`）
 
@@ -94,18 +98,15 @@ job-assistant/
 ├── sql/schema.sql                   # 13 张表 + 演示数据
 ├── scripts/                         # 冒烟脚本、截图脚本、请求样例、md→docx 工具
 ├── src/main/java/com/nuist/agent/
-│   ├── JobAssistantApplication.java # 启动类（@MapperScan com.nuist.agent.mapper）
-│   ├── job/                         # 求职业务：ai/auth/resume/position/analysis/interview/controller/config/common/dto/dashboard
-│   ├── entity/                      # 实体（含从 sb_test 复用的 R/UserAccount/SensitiveWord）
-│   ├── mapper/                      # 注解式 MyBatis Mapper
-│   ├── service/                     # 复用账号服务（MD5 加盐登录）
-│   ├── common/、exception/          # 统一错误码、业务异常、全局异常处理
-│   └── config/SensitiveWordConfig   # 敏感词 Bean（供 AI 输出过滤）
+│   ├── JobAssistantApplication.java # 启动类（@MapperScan com.nuist.agent.mapper + zhangxu.mapper）
+│   ├── zhangxu/                     # A（组长）：ai/auth/rag/common/config/controller/dto/entity/mapper/exception/service
+│   ├── job/                         # B/C 业务：resume/position/analysis/interview/controller/dashboard
+│   ├── entity/、mapper/             # B/C 模块的实体与注解式 MyBatis Mapper
 ├── src/main/resources/
 │   ├── application.yml              # 端口/数据源/网关与业务参数
 │   ├── prompts/job/*.st             # 5 个场景内置提示词模板
 │   └── static/{index.html,job/}     # 落地页 + 前端 SPA
-└── src/test/java/com/nuist/agent/job/  # 203 个用例（17 个测试类）
+└── src/test/java/com/nuist/agent/   # 223 个用例（19 个测试类；A 模块测试在 zhangxu/ 下）
 ```
 
 ## 六、安全与合规
@@ -122,4 +123,4 @@ job-assistant/
 含封面、目录页码、表格、代码块，`06-测试报告` 末尾内嵌 11 张页面截图）。
 工程内不再保留 Markdown 源文件；如需重新生成 Word，可用 `scripts/md2docx.py` + `scripts/build_course_docx.py`
 （先准备好 Markdown 源目录，再执行：`python scripts/build_course_docx.py <md目录> <输出目录>`）。
-文档中的路径引用（`src/main/java/com/nuist/agent/job/...`、`sql/...`、`scripts/...`）在本工程中均存在。
+文档中的路径引用（`src/main/java/com/nuist/agent/zhangxu/...`、`job/...`、`sql/...`、`scripts/...`）在本工程中均存在。

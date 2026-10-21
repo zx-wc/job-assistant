@@ -1,6 +1,6 @@
 package com.nuist.agent.job.analysis;
 
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 
 /**
  * 简历与岗位分析服务（成员 B）。

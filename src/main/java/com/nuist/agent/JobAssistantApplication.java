@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication
-@MapperScan(basePackages = "com.nuist.agent.mapper")
+@MapperScan(basePackages = {"com.nuist.agent.mapper", "com.nuist.agent.zhangxu.mapper"})
 public class JobAssistantApplication {
 
     public static void main(String[] args) {

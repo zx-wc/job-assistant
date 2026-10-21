@@ -2,7 +2,7 @@ package com.nuist.agent.job.interview;
 
 import com.nuist.agent.entity.InterviewQuestion;
 import com.nuist.agent.entity.InterviewSession;
-import com.nuist.agent.job.ai.AiResults;
+import com.nuist.agent.zhangxu.ai.AiResults;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

@@ -2,7 +2,7 @@ package com.nuist.agent.job.analysis;
 
 import com.nuist.agent.entity.JobPosition;
 import com.nuist.agent.entity.JobResume;
-import com.nuist.agent.job.ai.AiResults;
+import com.nuist.agent.zhangxu.ai.AiResults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,15 +1,15 @@
 package com.nuist.agent.job.resume;
 
-import com.nuist.agent.common.ErrorCode;
+import com.nuist.agent.zhangxu.common.ErrorCode;
 import com.nuist.agent.entity.JobResume;
 import com.nuist.agent.entity.JobResumeVersion;
-import com.nuist.agent.exception.BusinessException;
-import com.nuist.agent.job.common.PrivacyMasker;
-import com.nuist.agent.job.config.JobProperties;
-import com.nuist.agent.job.dto.JobDtos;
-import com.nuist.agent.job.dto.ViewDtos;
-import com.nuist.agent.job.rag.JobVectorService;
-import com.nuist.agent.job.rag.JobVectorServiceImpl;
+import com.nuist.agent.zhangxu.exception.BusinessException;
+import com.nuist.agent.zhangxu.common.PrivacyMasker;
+import com.nuist.agent.zhangxu.config.JobProperties;
+import com.nuist.agent.zhangxu.dto.JobDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
+import com.nuist.agent.zhangxu.rag.JobVectorService;
+import com.nuist.agent.zhangxu.rag.JobVectorServiceImpl;
 import com.nuist.agent.mapper.JobResumeMapper;
 import com.nuist.agent.mapper.JobResumeVersionMapper;
 import org.slf4j.Logger;

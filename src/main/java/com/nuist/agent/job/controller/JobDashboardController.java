@@ -1,9 +1,9 @@
 package com.nuist.agent.job.controller;
 
-import com.nuist.agent.entity.R;
-import com.nuist.agent.job.auth.UserContextHolder;
+import com.nuist.agent.zhangxu.entity.R;
+import com.nuist.agent.zhangxu.auth.UserContextHolder;
 import com.nuist.agent.job.dashboard.JobDashboardService;
-import com.nuist.agent.job.dto.ViewDtos;
+import com.nuist.agent.zhangxu.dto.ViewDtos;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

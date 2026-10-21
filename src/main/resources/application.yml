@@ -92,7 +92,7 @@ spring:
 
 # MyBatis（纯 MyBatis，注解式 Mapper）
 mybatis:
-  type-aliases-package: com.nuist.agent.entity
+  type-aliases-package: com.nuist.agent.entity,com.nuist.agent.zhangxu.entity
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
