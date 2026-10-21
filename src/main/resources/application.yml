@@ -1,0 +1,149 @@
+server:
+  port: 8080
+
+# 日志格式：%X{traceId} 为链路追踪预留位（未接入过滤器时为空）
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %X{traceId:-} %logger{40} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %X{traceId:-} %logger{40} - %msg%n"
+  level:
+    com.nuist.agent: INFO
+
+spring:
+  application:
+    name: job-assistant
+
+  # 关闭 Spring AI 官方 Milvus 自动配置：它会在启动时创建 MilvusServiceClient 并连接 Milvus，
+  # Milvus 不可用时会导致整个应用启动失败。改由 JobVectorConfig 以 @Lazy 方式按需连接。
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+
+  # 数据源（独立库 job_assistant，与 sb_test 的 ai-agent 互不影响）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/job_assistant?characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:Nuist@123}
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # 安全：关闭 Druid 监控页，避免未授权访问 /druid
+      stat-view-servlet:
+        enabled: false
+
+  # 静态资源禁用浏览器缓存，避免前端更新后仍加载旧文件
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
+
+  # 简历文本导入（txt/md）上传限制
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 4MB
+
+  ai:
+    dashscope:
+      # 安全：密钥只从环境变量读取，不入库、不下发前端
+      # 未配置时使用占位值，避免 Spring AI 自动配置在启动阶段因密钥为空直接失败；
+      # 真实调用会因鉴权失败抛出异常，由 AI 网关捕获后走本地规则降级
+      api-key: ${DASHSCOPE_API_KEY:sk-not-configured}
+      chat:
+        options:
+          model: qwen-plus
+          temperature: 0.3
+      # 向量化模型（简历/岗位分块入库 Milvus 前先转成向量）
+      embedding:
+        enabled: true
+        options:
+          model: text-embedding-v2
+        workspace-id: ${DASHSCOPE_WORKSPACE_ID:}
+
+    # Milvus 向量库（简历/岗位知识库 RAG）
+    vectorstore:
+      milvus:
+        client:
+          # 默认指向课程实验环境的 Milvus，可用环境变量覆盖
+          host: ${MILVUS_HOST:192.168.100.200}
+          port: ${MILVUS_PORT:19530}
+          username: ${MILVUS_USERNAME:}
+          password: ${MILVUS_PASSWORD:}
+          # 连接超时/调用超时（毫秒），避免 Milvus 不通时请求长时间挂起
+          connect-timeout-ms: 3000
+          rpc-deadline-ms: 5000
+        databaseName: "default"
+        collectionName: "job_knowledge"
+        embeddingDimension: 1536
+        indexType: IVF_FLAT
+        metricType: COSINE
+        # 首次启动自动建集合与索引
+        initializeSchema: true
+
+# MyBatis（纯 MyBatis，注解式 Mapper）
+mybatis:
+  type-aliases-package: com.nuist.agent.entity,com.nuist.agent.zhangxu.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mapper/*.xml
+
+# ============================================================================
+# 智能求职辅助系统业务与网关参数
+# ============================================================================
+job:
+  security:
+    # 登录令牌有效期（小时）：7 天
+    token-ttl-hours: 168
+    # 剩余有效期低于该小时数时滑动续期
+    refresh-threshold-hours: 24
+    # 管理员用户名（登录时自动授予 ADMIN）
+    admin-usernames:
+      - admin
+  ai:
+    # 离线演示可设为 false：全部业务走本地规则降级
+    enabled: true
+    model: qwen-plus
+    fallback-models:
+      - qwen-turbo
+    timeout-ms: 20000
+    max-retries: 2
+    retry-backoff-ms: 300
+    rate-limit-per-minute: 20
+    rate-limit-window-seconds: 60
+    cache-ttl-seconds: 600
+    cache-max-entries: 200
+    circuit-failure-threshold: 3
+    circuit-open-ms: 60000
+    temperature: 0.4
+    max-input-chars: 8000
+  resume:
+    max-content-length: 20000
+    default-page-size: 10
+  interview:
+    default-question-count: 5
+    max-question-count: 12
+    min-answer-length: 10
+  upload:
+    max-file-size: 1048576
+  # 向量检索（Milvus RAG）策略：简历/岗位切块入库，分析/出题前检索相关片段注入提示词
+  vector:
+    enabled: true
+    collection-name: job_knowledge
+    chunk-size: 320
+    chunk-overlap: 60
+    top-k: 4
+    similarity-threshold: 0.55
+    max-chunks-per-source: 24
+    # Milvus 失败后的短路窗口（毫秒），窗口内直接跳过向量操作
+    unavailable-window-ms: 60000
