@@ -1,13 +1,16 @@
-# 智能求职辅助系统（独立部署版）
+# 智能求职辅助系统（A 部分 · 组长 zhangxu）
 
-从课程工程 `sb_test` 中抽取的**求职辅助子系统**，只保留简历、岗位、分析、模拟面试、反馈、用户权限、AI 网关与向量检索，
-不包含原电商 AI 客服的 FAQ / 商品 / 订单相关功能，依赖更少、启动更快，可单独部署与提交。
-> 工程位置：`C:\soft\job-assistant`（标准 Spring Boot 工程，含 `mvnw` 包装器；也可用 `mvn.cmd` 或 IDE 直接导入）。
+本仓库按课程《智能求职辅助系统 五人任务划分》组织：**当前只提交成员 A（zhangxu）的代码**，
+即用户与权限、大模型 API 网关、向量检索 RAG、公共组件与接口契约；B/C/D/E 位于 `com.nuist.agent.b/c/d/e`
+的**占位包**，由各成员补充实现。
+
+> 完整五人代码在 git 历史中仍可找回（提交 `371d250` 及之前），需要时执行
+> `git checkout 371d250 -- .` 或 `git revert` 即可恢复。
 
 - 后端：Java 17 + Spring Boot 3.5.16 + MyBatis（注解式）+ MySQL 8 + Druid + Spring AI Alibaba（DashScope / 通义千问）+ Milvus 2.4（向量检索 RAG）
-- 前端：原生 ES Module + Hash 路由 SPA（零构建），`src/main/resources/static/job/`
-- 数据库：`job_assistant`，执行 `sql/schema.sql` 一键建库建表
-- 测试：223 个自动化用例（JUnit 5 + Mockito + MockMvc），另有端到端冒烟脚本与页面截图脚本
+- 前端：原生 ES Module + Hash 路由 SPA（零构建，`src/main/resources/static/job/`，由成员 D 补充）
+- 数据库：`job_assistant`，执行 `sql/schema.sql` 建库建表（由成员 E 补充）
+- 测试：A 的 11 个测试类（AI 网关、鉴权、脱敏、RAG、管理端鉴权）
 
 ## 一、快速开始
 
@@ -36,91 +39,86 @@ java -jar target/job-assistant-1.0.0.jar
 
 ## 二、功能模块与代码位置（按五人分工划分包）
 
-包结构按课程任务划分组织：**A（组长）的代码统一放在 `com.nuist.agent.zhangxu` 包下**，B/C 的业务模块在 `com.nuist.agent.job.*`，D 的前端在 `static/job/`，E 的脚本与建库在 `sql/`、`scripts/`。
+包结构按课程任务划分组织：**A 的代码统一在 `com.nuist.agent.zhangxu`**，B/C 用 `com.nuist.agent.b` / `com.nuist.agent.c`，
+D 用 `com.nuist.agent.d`，E 用 `com.nuist.agent.e`（后四个目前只有 `package-info.java` 占位，等成员补齐）。
 
-| 分工 | 模块 | 代码位置 | 说明 |
+| 分工 | 模块 | 代码位置 | 状态 |
 | --- | --- | --- | --- |
-| A | 用户与权限 | `zhangxu/auth/`、`zhangxu/controller/JobAuthController.java` | 注册登录、32 位令牌 + 7 天滑动续期、注销、USER/ADMIN、拦截器 + ThreadLocal 用户上下文 |
-| A | AI 网关 | `zhangxu/ai/`、`zhangxu/controller/JobAdminAiController.java` | 模板三级加载、超时、重试 + 备用模型、单用户限流、结果缓存、熔断降级、结构化 JSON、调用日志 |
-| A | 向量检索 RAG | `zhangxu/rag/`、`zhangxu/config/JobVectorConfig.java` | 简历/岗位切块写入 Milvus，分析与出题前语义召回注入提示词；懒连接 + 不可用自动降级 |
-| A | 公共组件 | `zhangxu/common/`、`zhangxu/config/`、`zhangxu/exception/`、`zhangxu/dto/`、`zhangxu/entity/`、`zhangxu/mapper/` | 统一响应 `R` 与错误码、全局异常、配置绑定、JSON 工具、敏感信息脱敏、接口 DTO、A 模块实体与 Mapper |
-| B | 简历管理 | `job/resume/` | 增删改查、txt/md 导入、正文变更自动留版本、版本查看/存档/回滚 |
-| B | 岗位管理 | `job/position/` | 岗位与 JD 录入、检索、增删改查 |
-| B | 简历岗位分析 | `job/analysis/` | 匹配度 + 维度评分 + 优势/短板/建议/缺失技能/面试重点，AI 不可用时关键词降级 |
-| C | 模拟面试 | `job/interview/` | 围绕岗位出题、逐题评分点评、多轮追问、整场反馈报告、训练记录 |
-| A/D | 求职概览与接口层 | `job/dashboard/`、`job/controller/` | 概览统计聚合；`/api/job/**` 共 42 个接口（含 A 的两个控制器在 `zhangxu/controller`） |
-| D | 前端 | `static/job/` | 登录注册、概览、简历、岗位、分析、面试、反馈、AI 网关管理共 11 个页面 |
-| E | 数据库与脚本 | `sql/schema.sql`、`scripts/` | 13 张表（2 张基础 + 11 张业务）+ 索引 + 演示数据；冒烟/截图/文档脚本 |
+| A | 用户与权限 | `zhangxu/auth/`、`zhangxu/controller/JobAuthController.java` | ✅ 已提交：注册登录、32 位令牌 + 7 天滑动续期、注销、USER/ADMIN、拦截器 + ThreadLocal 用户上下文 |
+| A | AI 网关 | `zhangxu/ai/`、`zhangxu/controller/JobAdminAiController.java` | ✅ 已提交：模板三级加载、超时、重试 + 备用模型、单用户限流、结果缓存、熔断降级、结构化 JSON、调用日志 |
+| A | 向量检索 RAG | `zhangxu/rag/`、`zhangxu/config/JobVectorConfig.java` | ✅ 已提交：文本切块、Milvus 懒连接、按用户/来源检索、故障短路降级 |
+| A | 公共组件 | `zhangxu/common/`、`zhangxu/config/`、`zhangxu/exception/`、`zhangxu/dto/`、`zhangxu/entity/`、`zhangxu/mapper/` | ✅ 已提交：统一响应 `R` 与错误码、全局异常、配置绑定、JSON 工具、敏感信息脱敏、接口 DTO、A 模块实体与 Mapper |
+| B | 简历管理 | `com.nuist.agent.b.resume` | ⬜ 占位包，待成员 B 实现 |
+| B | 岗位管理 | `com.nuist.agent.b.position` | ⬜ 占位包，待成员 B 实现 |
+| B | 简历岗位分析 | `com.nuist.agent.b.analysis` | ⬜ 占位包，待成员 B 实现 |
+| C | 模拟面试与反馈 | `com.nuist.agent.c.interview` | ⬜ 占位包，待成员 C 实现 |
+| D | 前端页面 | `com.nuist.agent.d.web` + `src/main/resources/static/job/` | ⬜ 占位包，待成员 D 实现 |
+| E | 数据库/测试/部署 | `com.nuist.agent.e.db` + `sql/`、`scripts/` | ⬜ 占位包，待成员 E 实现 |
 
-> 其余成员若要按同样方式拆包，告我名字即可（如 B 的 `job/resume|position|analysis` 迁到 `com.nuist.agent.<名字>.*`）。
+> 说明：本仓库当前只提交 **A 的代码**；A 的 RAG 服务保留了与简历/岗位实体交互的方法签名，
+> 待 B 的实体与 Mapper 补齐后即可编译运行（当前缺 B/C 代码，`mvn compile` 会报找不到符号，属预期）。
 
-## 三、接口一览（前缀 `/api/job`）
+## 三、接口一览（前缀 `/api/job`，当前仅 A 的接口）
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | POST | `/auth/register`、`/auth/login` | 注册 / 登录，返回令牌 |
 | GET | `/auth/me`、`/auth/ping` | 当前用户 / 健康检查（免登录） |
 | POST | `/auth/logout` | 注销令牌 |
-| GET/POST | `/resumes` | 简历分页 / 新建 |
-| GET/PUT/DELETE | `/resumes/{id}` | 详情 / 编辑 / 删除 |
-| GET/POST | `/resumes/{id}/versions` | 版本列表 / 手动存档 |
-| GET | `/resumes/{id}/versions/{no}` | 版本详情 |
-| POST | `/resumes/{id}/versions/{no}/restore` | 回滚版本 |
-| POST | `/resumes/upload-text` | 上传 txt/md（返回脱敏正文） |
-| GET/POST/PUT/DELETE | `/positions`、`/positions/{id}` | 岗位增删改查 |
-| POST/GET | `/analyses`、`/analyses/{id}` | 生成分析 / 报告列表与详情 |
-| POST/GET | `/interviews`、`/interviews/{id}` | 开始面试 / 会话详情 |
-| POST | `/interviews/{id}/answers`、`/follow-up`、`/finish` | 作答评分 / 追问 / 结束出报告 |
-| GET | `/interviews/{id}/report` | 反馈报告 |
-| GET | `/dashboard` | 求职概览 |
-| GET/PUT/DELETE | `/admin/ai/config`、`/stats`、`/scenes`、`/templates/{scene}`、`/logs` | 网关配置（密钥脱敏）、统计、模板管理、调用日志（仅 ADMIN） |
+| GET | `/admin/ai/config` | 网关配置（密钥脱敏，仅 ADMIN） |
+| GET | `/admin/ai/stats` | 调用统计（仅 ADMIN） |
+| GET | `/admin/ai/scenes` | 场景与模板来源（仅 ADMIN） |
+| GET/PUT/DELETE | `/admin/ai/templates`、`/admin/ai/templates/{scene}` | 模板列表 / 保存 / 还原（仅 ADMIN） |
+| GET | `/admin/ai/logs` | 调用日志分页（仅 ADMIN） |
+| GET | `/admin/ai/vector` | 向量库状态（仅 ADMIN） |
+| POST | `/admin/ai/vector/reindex` | 重建索引（仅 ADMIN） |
+| POST | `/admin/ai/vector/search` | 语义检索调试（仅 ADMIN） |
+
+B/C/D 的接口（简历、岗位、分析、面试、概览）随各自模块一起补充。
 
 详细契约见课程文档《04-接口规范与详细设计.docx》（交付目录 `C:\Users\wangchuan\Desktop\软件工程实践实验\报告\`）。
 
 ## 四、验证
 
 ```bash
-# 自动化测试（223 个用例，无需数据库与网络）
+# A 模块单元测试（11 个测试类：AI 网关、缓存、限流、JSON、模板、令牌、脱敏、RAG、管理端鉴权）
 mvn test
 
-# 端到端冒烟（需先启动服务，默认 http://127.0.0.1:8080）
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/smoke_test.ps1
-
-# 页面截图（可选，需 Chrome 以 --remote-debugging-port=9222 启动）
-node scripts/ui_shots.mjs shots
+# 说明：完整版（含 B/C 的 223 个用例）在提交 371d250 中，可用 git checkout 371d250 -- src/test 找回
 ```
+
+> 当前仓库缺少 B/C 的实体与 Mapper，`mvn test` 会因找不到符号失败，属按分工裁剪后的预期状态。
 
 ## 五、目录结构
 
 ```
 job-assistant/
 ├── pom.xml
-├── sql/schema.sql                   # 13 张表 + 演示数据
-├── scripts/                         # 冒烟脚本、截图脚本、请求样例、md→docx 工具
 ├── src/main/java/com/nuist/agent/
 │   ├── JobAssistantApplication.java # 启动类（@MapperScan com.nuist.agent.mapper + zhangxu.mapper）
-│   ├── zhangxu/                     # A（组长）：ai/auth/rag/common/config/controller/dto/entity/mapper/exception/service
-│   ├── job/                         # B/C 业务：resume/position/analysis/interview/controller/dashboard
-│   ├── entity/、mapper/             # B/C 模块的实体与注解式 MyBatis Mapper
+│   ├── zhangxu/                     # A：ai/auth/rag/common/config/controller/dto/entity/mapper/exception/service
+│   ├── b/resume|position|analysis   # B：占位包（package-info.java）
+│   ├── c/interview                  # C：占位包
+│   ├── d/web                        # D：占位包（前端在 static/job/）
+│   └── e/db                         # E：占位包（脚本在 sql/、scripts/）
 ├── src/main/resources/
 │   ├── application.yml              # 端口/数据源/网关与业务参数
-│   ├── prompts/job/*.st             # 5 个场景内置提示词模板
-│   └── static/{index.html,job/}     # 落地页 + 前端 SPA
-└── src/test/java/com/nuist/agent/   # 223 个用例（19 个测试类；A 模块测试在 zhangxu/ 下）
+│   └── prompts/job/*.st             # 5 个场景内置提示词模板
+└── src/test/java/com/nuist/agent/zhangxu/  # A 的 11 个测试类
 ```
 
 ## 六、安全与合规
 
 - DashScope 密钥只从环境变量 `DASHSCOPE_API_KEY` 读取，不入库、不下发前端；管理端只返回脱敏值。
-- 简历/岗位正文入库前对手机号、邮箱、身份证、银行卡脱敏（`PrivacyMasker`）。
-- 所有业务查询以登录上下文 `userId` 为条件；管理员接口二次校验角色。
+- 公共组件提供 `PrivacyMasker`（手机号/邮箱/身份证/银行卡掩码），供 B 的简历与岗位模块调用。
+- 所有业务查询以登录上下文 `userId` 为条件；管理员接口二次校验角色（`UserContextHolder.requireAdmin()`）。
 - AI 输出经敏感词过滤（忽略纯数字命中，避免误伤"2024 届""15k-25k"）。
 - Druid 监控页默认关闭；密码 MD5 加盐存储；令牌 7 天过期且可注销。
 
 ## 七、与课程文档的关系
 
-课程文档 00-08 已转换为 Word 文档，交付在 `C:\Users\wangchuan\Desktop\软件工程实践实验\报告\`（共 9 份 .docx，
-含封面、目录页码、表格、代码块，`06-测试报告` 末尾内嵌 11 张页面截图）。
-工程内不再保留 Markdown 源文件；如需重新生成 Word，可用 `scripts/md2docx.py` + `scripts/build_course_docx.py`
-（先准备好 Markdown 源目录，再执行：`python scripts/build_course_docx.py <md目录> <输出目录>`）。
-文档中的路径引用（`src/main/java/com/nuist/agent/zhangxu/...`、`job/...`、`sql/...`、`scripts/...`）在本工程中均存在。
+- 课程文档 00-08 已转换为 Word，交付在 `C:\Users\wangchuan\Desktop\软件工程实践实验\报告\`（9 份 .docx，
+  含封面、目录页码、表格、代码块，`06-测试报告` 末尾内嵌 11 张页面截图）。文档描述的是**完整五人系统**。
+- 本仓库当前只提交 A 的代码，`sql/`、`scripts/`、前端页面、B/C 模块已按分工移除（包结构保留）。
+- 完整可运行版本在 git 历史提交 `371d250`（含 B/C/D/E 全部代码、223 个测试、建库脚本与冒烟脚本），需要时：
+  `git checkout 371d250 -- .` 恢复全部，或 `git checkout 371d250 -- src/test sql scripts` 只取回测试与脚本。
