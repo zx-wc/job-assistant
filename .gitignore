@@ -1,0 +1,38 @@
+# ---- Java / Maven ----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- 运行产物与日志 ----
+*.log
+*.err
+run.log
+run.err
+logs/
+**/shots/
+
+# ---- 敏感信息 ----
+# 大模型密钥只放环境变量 DASHSCOPE_API_KEY，禁止提交任何密钥文件
+*.env
+.env
+application-local.yml
+
+# ---- Python 工具缓存 ----
+__pycache__/
+*.pyc
